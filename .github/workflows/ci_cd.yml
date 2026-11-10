@@ -45,7 +45,7 @@ jobs:
   # JOB 2 : Construction Docker
   build:
     needs: test
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
       # Récupérer le code
