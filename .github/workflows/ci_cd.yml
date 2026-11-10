@@ -1,0 +1,54 @@
+# Nom du workflow
+name: CI/CD Pipeline
+
+# Déclencheurs
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+# Les tâches à exécuter
+jobs:
+
+  # JOB 1 : Tests
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Récupérer le code du dépôt
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      # Installer Python 3.12
+      - name: Installer Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      # Installer les dépendances
+      - name: Installer les dépendances
+        run: pip install -r requirements.txt
+
+      # Exécuter les tests
+      - name: Lancer les tests
+        run: pytest -q
+
+  # JOB 2 : Construction Docker
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      # Récupérer le code
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      # Construire l'image Docker
+      - name: Construire l'image Docker
+        run: docker build -t myapp:${{ github.sha }} .
+
+      # Confirmer la construction
+      - name: Confirmer le build
+        run: echo "Image construite avec le tag myapp:${GITHUB_SHA}"
